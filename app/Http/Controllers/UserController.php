@@ -30,7 +30,7 @@ class UserController extends Controller
         ]);
         $newUser->save();
         Auth::login($newUser);
-        $token = $newUser->createToken($request["email"], ['server:update']);
+        $token = $newUser->createToken($request["email"]);
         $newUser["api_token"] = $token->plainTextToken;
         $data = [
             'success' => true,
@@ -58,8 +58,7 @@ class UserController extends Controller
         if ($validUser) {
             $user = Auth::getProvider()->retrieveByCredentials(['email' => $request["email"], 'password' => $request["password"]]);
             Auth::login($user);
-            $token = $user->createToken($request["email"], ['server:update']);
-            $user["api_token"] = $token->plainTextToken;
+            $user["api_token"] = $user->createToken($request["email"], ['server:update'])->plainTextToken;
             $data = [
                 'success' => true,
                 'data' => $user
@@ -73,5 +72,13 @@ class UserController extends Controller
                 'message' => 'Invalid credentials',
             ], 401)->header('Status-Code', '401'));
         }
+    }
+
+    public function logout(){
+        Auth::user()->tokens()->where('id', Auth::id())->delete();
+        $user = Auth()->user();
+        $user->tokens()->where('id', $user->currentAccessToken()->id)->delete();
+        return response()->json([   'success' => true,
+            'message' => 'User successfully logged out'])->header('Status-Code', '200');
     }
 }

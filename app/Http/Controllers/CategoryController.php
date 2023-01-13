@@ -14,6 +14,6 @@ class CategoryController extends Controller
      */
     public function getCategories(){
         $list = Category::query()->with('child_category')->get();
-        return response()->json(['a' => $list]);
+        return response()->json(['list' => $list]);
     }
 }

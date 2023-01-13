@@ -4,6 +4,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use \App\Http\Controllers\UserController;
 use \App\Http\Controllers\CategoryController;
+use \App\Http\Controllers\ProductController;
+use \App\Http\Controllers\CartController;
+use \App\Http\Controllers\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,4 +26,18 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('register', [UserController::class, 'register']);
 Route::post('login', [UserController::class, 'login']);
 
-Route::post('categories', [CategoryController::class, 'getCategories']);
+Route::get('categories', [CategoryController::class, 'getCategories']);
+Route::get('products', [ProductController::class, 'getProducts']);
+Route::get('products/{slug}', [ProductController::class, 'getProductBySlug']);
+
+Route::post('cart/add', [CartController::class, 'store']);
+Route::post('/cart/delete', [CartController::class, 'destroy']);
+Route::post('cart/delete/all', [CartController::class, 'destroyAll']);
+
+Route::post('product/{id}/buy', [OrderController::class, 'buyProduct']);
+
+Route::middleware('auth:sanctum')->group(function(){
+    Route::post('/logout', [UserController::class, 'logout']);
+    Route::get('order/list', [OrderController::class, 'getMyOrderList']);
+});
+
